@@ -1,26 +1,111 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Satoshi:wght@300;400;500;600&display=swap');
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-feature-settings: 'kern', 'liga', 'clig', 'calt';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Main content (name, title, links) uses Satoshi for a warmer feel */
+  h1, h2, nav a {
+    font-family: 'Satoshi', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .project-item {
+    @apply flex cursor-pointer transition-all duration-300 ease-out;
+    align-items: center;
+  }
+
+  .project-item:hover {
+    transform: translateX(8px);
+  }
+
+  .project-name {
+    @apply text-[#272727] font-normal text-lg transition-all duration-300 ease-out;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    flex: 1;
+  }
+
+  .project-item:hover .project-name {
+    @apply text-[#cc35aa];
+    font-weight: 500;
+  }
+
+  .project-year {
+    @apply text-[#979797] font-normal text-lg transition-all duration-300 ease-out;
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    margin-left: 0.75rem; /* Much closer to titles */
+    min-width: 60px;
+    text-align: right;
+  }
+
+  .hover-bubble {
+    animation: genie-appear 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    transform-origin: left center;
+  }
+
+  @keyframes genie-appear {
+    0% {
+      opacity: 0;
+      transform: scale(0.3) translateY(-50%) translateX(-20px);
+      filter: blur(2px);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.05) translateY(-50%) translateX(0px);
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(-50%) translateX(0px);
+      filter: blur(0px);
+    }
+  }
+
+  .hover-bubble-exit {
+    animation: genie-disappear 0.2s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
+  }
+
+  @keyframes genie-disappear {
+    0% {
+      opacity: 1;
+      transform: scale(1) translateY(-50%) translateX(0px);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(0.8) translateY(-50%) translateX(-10px);
+      filter: blur(1px);
+    }
+  }
+
+  .bubble-content {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow:
+      0 20px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04),
+      0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+  }
 }

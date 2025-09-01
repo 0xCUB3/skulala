@@ -190,159 +190,59 @@ export default function Home() {
 
   const projects: ProjectData[] = [
     {
-      name: "DM Resharing",
-      year: "2022",
+      name: "wBlock",
+      year: "2025",
       content: {
-        description: "Instagram feature that allows users to reshare direct messages to their stories, creating more engagement and social sharing opportunities.",
-        images: ["https://ext.same-assets.com/3898303924/4290964696.png"],
-        details: ["Increased story engagement by 23%", "Simplified sharing workflow", "Enhanced privacy controls"]
+        description: "Advanced, privacy-focused, free, and open-source ad blocker built for Safari users."
       }
     },
     {
-      name: "Media Viewer",
-      year: "2022",
+      name: "Sir-Tim-the-Timely",
+      year: "2025",
       content: {
-        description: "Redesigned media viewing experience across Instagram and Messenger with improved navigation and interactive elements.",
-        images: ["https://ext.same-assets.com/3898303924/1968184817.png"],
-        details: ["Full-screen immersive experience", "Gesture-based navigation", "Enhanced zoom and pan controls"]
+        description: "A Hikari Discord bot for the MIT Class of 2029 Discord server."
       }
     },
     {
-      name: "Command System",
-      year: "2022",
+      name: "Near-Perfect-Tester",
+      year: "2025",
       content: {
-        description: "Advanced command interface for Messenger that enables power users to quickly access features and perform actions.",
-        details: ["Slash commands for quick actions", "Customizable shortcuts", "Developer-friendly API"]
+        description: "Toolkit to efficiently find k-near perfect numbers. Completed for a research paper that made significant contributions to the study of 2-near perfect numbers."
       }
     },
     {
-      name: "Send Interaction",
-      year: "2022",
+      name: "HandMaestro",
+      year: "2024",
       content: {
-        description: "Improved message sending experience with better feedback, animations, and interaction patterns.",
-        details: ["Haptic feedback integration", "Send button micro-interactions", "Message state indicators"]
+        description: "On-device ASL gesture practice site using TensorFlow."
       }
     },
     {
-      name: "@Everyone",
-      year: "2022",
+      name: "Modified-Dots-and-Boxes",
+      year: "2024",
       content: {
-        description: "Group messaging feature that allows users to mention all participants in a conversation efficiently.",
-        details: ["Smart notification controls", "Permission-based access", "Reduced notification fatigue"]
+        description: "Wheel Graph Dots-and-Boxes game for Pygame, complete with winning algorithms for various graph families. Completed for a research paper."
       }
     },
     {
-      name: "/Gif",
-      year: "2022",
+      name: "SciTool",
+      year: "2024",
       content: {
-        description: "Quick GIF search and sharing functionality integrated directly into the messaging interface.",
-        details: ["Instant search results", "Trending GIF suggestions", "Keyboard shortcuts support"]
+        description: "SwiftUI-based scientific calculator and simulator tools for macOS."
       }
     },
     {
-      name: "/Silent",
-      year: "2022",
+      name: "BetterCamp-macOS",
+      year: "2024",
       content: {
-        description: "Silent message feature that sends messages without triggering notifications for recipients.",
-        details: ["Context-aware suggestions", "Visual silent indicators", "Respect for do-not-disturb modes"]
+        description: "Alternative macOS BootCamp Assistant and patcher."
       }
     },
     {
-      name: "Gyro Pride Theme",
-      year: "2021",
+      name: "Archie",
+      year: "2024",
       content: {
-        description: "Special Pride Month theme for Messenger featuring dynamic colors and celebratory animations.",
-        images: ["https://ext.same-assets.com/3898303924/2395632951.png"],
-        details: ["Motion-responsive color changes", "Inclusive design principles", "Community celebration focus"]
-      }
-    },
-    {
-      name: "Word Effects",
-      year: "2021",
-      content: {
-        description: "Dynamic text effects that trigger animations when specific words are sent in messages.",
-        details: ["Contextual animation triggers", "Customizable effect library", "Performance optimized rendering"]
-      }
-    },
-    {
-      name: "Reactions",
-      year: "2021",
-      content: {
-        description: "Enhanced message reaction system with improved animations and expanded emoji options.",
-        details: ["Long-press gesture recognition", "Animated reaction bubbles", "Social presence indicators"]
-      }
-    },
-    {
-      name: "Tweets in Thread",
-      year: "2021",
-      content: {
-        description: "Instagram feature allowing users to share Twitter thread content seamlessly within the platform.",
-        details: ["Thread auto-detection", "Cross-platform integration", "Preserved formatting and context"]
-      }
-    },
-    {
-      name: "Super React",
-      year: "2020",
-      content: {
-        description: "Enhanced reaction system for Instagram with amplified visual feedback and social engagement.",
-        details: ["Burst animation effects", "Social amplification mechanics", "Engagement analytics integration"]
-      }
-    },
-    {
-      name: "Shops Products",
-      year: "2020",
-      content: {
-        description: "Instagram Shopping interface redesign focusing on product discovery and seamless purchasing experience.",
-        images: ["https://ext.same-assets.com/3898303924/2510777545.png"],
-        details: ["AR try-on integration", "One-tap purchasing flow", "Personalized recommendations"]
-      }
-    },
-    {
-      name: "Instagram Shops",
-      year: "2020",
-      content: {
-        description: "Complete shopping destination within Instagram, enabling businesses to create immersive storefronts.",
-        details: ["Merchant dashboard tools", "Collection curation features", "Social proof integration"]
-      }
-    },
-    {
-      name: "Origami System",
-      year: "2020",
-      content: {
-        description: "Design system and prototyping framework used across Meta's family of apps for consistent user experiences.",
-        details: ["Component library standardization", "Cross-platform design tokens", "Rapid prototyping workflows"]
-      }
-    },
-    {
-      name: "Messenger Shops",
-      year: "2020",
-      content: {
-        description: "Shopping experience integrated into Messenger conversations, enabling seamless commerce within chat.",
-        details: ["Conversational commerce flow", "Payment integration", "Business messaging tools"]
-      }
-    },
-    {
-      name: "Microsoft Project",
-      year: "2019",
-      content: {
-        description: "Project management interface redesign focusing on team collaboration and timeline visualization.",
-        details: ["Gantt chart improvements", "Real-time collaboration", "Resource allocation tools"]
-      }
-    },
-    {
-      name: "Microsoft Tasks",
-      year: "2018",
-      content: {
-        description: "Task management application with intelligent organization and cross-platform synchronization.",
-        details: ["Smart list organization", "Calendar integration", "AI-powered suggestions"]
-      }
-    },
-    {
-      name: "Mobile Tasks",
-      year: "2017",
-      content: {
-        description: "Mobile-first task management experience with gesture-based interactions and offline capabilities.",
-        details: ["Swipe gesture controls", "Offline synchronization", "Widget customization"]
+        description: "Python Discord bot for checking and reporting Arc forum invite status, built for the Arc Discord server prior to Arc Browser's public release."
       }
     },
   ];
@@ -477,7 +377,7 @@ export default function Home() {
             }}
           >
             <motion.h1 
-              className="text-3xl lg:text-4xl font-light text-[#272727] leading-tight mb-1 lg:mb-2"
+              className="text-3xl lg:text-4xl font-bold text-[#272727] leading-tight mb-1 lg:mb-2"
               animate={{
                 scale: titlePosition === 'top' ? 0.9 : 1
               }}
@@ -490,7 +390,7 @@ export default function Home() {
               Alexander Skula,
             </motion.h1>
             <motion.h2 
-              className="text-3xl lg:text-4xl font-light text-[#272727] leading-tight mb-6 lg:mb-8"
+              className="text-3xl lg:text-4xl font-bold text-[#272727] leading-tight mb-6 lg:mb-8"
               animate={{
                 scale: titlePosition === 'top' ? 0.9 : 1
               }}
@@ -501,7 +401,7 @@ export default function Home() {
               }}
             >
               CS and math student at{" "}
-              <span className="text-[#8A1538] font-medium">MIT</span>
+              <span className="text-[#8A1538] font-bold">MIT</span>
             </motion.h2>
 
             <motion.nav 

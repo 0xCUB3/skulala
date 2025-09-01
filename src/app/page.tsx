@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import BScroll from '@better-scroll/core';
+import NoiseBackground from '@/components/NoiseBackground';
 
 interface ProjectData {
   name: string;
@@ -23,9 +24,33 @@ export default function Home() {
   const bScrollRef = useRef<BScroll | null>(null);
   const hoverElementRef = useRef<HTMLDivElement | null>(null);
   
-  // Mouse tracking for popup movement
+  // Mouse tracking for popup movement and dynamic site effects
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [windowDimensions, setWindowDimensions] = useState({ width: 1920, height: 1080 });
+  
+  // Update window dimensions
+  useEffect(() => {
+    const updateDimensions = () => {
+      setWindowDimensions({ 
+        width: window.innerWidth, 
+        height: window.innerHeight 
+      });
+    };
+    
+    if (typeof window !== 'undefined') {
+      updateDimensions();
+      window.addEventListener('resize', updateDimensions);
+      return () => window.removeEventListener('resize', updateDimensions);
+    }
+  }, []);
+  
+  // Transform cursor position to influence entire site
+  const backgroundShiftX = useTransform(mouseX, [0, windowDimensions.width], [-20, 20]);
+  const backgroundShiftY = useTransform(mouseY, [0, windowDimensions.height], [-15, 15]);
+  const glowIntensity = useTransform(mouseX, [0, windowDimensions.width], [0.02, 0.08]);
+  const tintShift = useTransform(mouseY, [0, windowDimensions.height], [245, 252]);
   
   const popupX = useTransform(
     mouseX, 
@@ -33,7 +58,7 @@ export default function Home() {
       if (!hoverElementRef.current) return '-50%';
       const rect = hoverElementRef.current.getBoundingClientRect();
       const relativeX = value - rect.left - rect.width / 2;
-      const moveAmount = (relativeX / rect.width) * 45; // 75% movement - max 45px horizontal
+      const moveAmount = (relativeX / rect.width) * 135; // 225% movement - max 135px horizontal (3x of 45px)
       return `calc(-50% + ${moveAmount}px)`;
     },
     {
@@ -47,7 +72,7 @@ export default function Home() {
       if (!hoverElementRef.current) return '-50%';
       const rect = hoverElementRef.current.getBoundingClientRect();
       const relativeY = value - rect.top - rect.height / 2;
-      const moveAmount = (relativeY / rect.height) * 15; // 25% movement - max 15px vertical
+      const moveAmount = (relativeY / rect.height) * 45; // 75% movement - max 45px vertical (3x of 15px)
       return `calc(-50% + ${moveAmount}px)`;
     },
     {
@@ -55,18 +80,17 @@ export default function Home() {
     }
   );
 
-  // Track mouse movement when hovering
+  // Track mouse movement for popup and cursor gradient
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
+      setCursorPosition({ x: e.clientX, y: e.clientY });
     };
     
-    if (hoveredProject !== null) {
-      window.addEventListener('mousemove', handleMouseMove);
-      return () => window.removeEventListener('mousemove', handleMouseMove);
-    }
-  }, [hoveredProject, mouseX, mouseY]);
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [mouseX, mouseY]);
 
   // Enhanced responsive title positioning with smooth transitions
   useEffect(() => {
@@ -125,32 +149,32 @@ export default function Home() {
     }
   }, []);
 
-  // Initialize BetterScroll for iOS-like bounce scrolling
-  useEffect(() => {
-    if (scrollRef.current && !bScrollRef.current) {
-      bScrollRef.current = new BScroll(scrollRef.current, {
-        scrollY: true,
-        scrollX: false,
-        bounce: {
-          top: true,
-          bottom: true,
-          left: false,
-          right: false
-        },
-        bounceTime: 600,
-        probeType: 1,
-        click: true,
-        tap: true
-      });
-    }
+  // Disable BetterScroll - using native scrolling instead
+  // useEffect(() => {
+  //   if (scrollRef.current && !bScrollRef.current) {
+  //     bScrollRef.current = new BScroll(scrollRef.current, {
+  //       scrollY: true,
+  //       scrollX: false,
+  //       bounce: {
+  //         top: true,
+  //         bottom: true,
+  //         left: false,
+  //         right: false
+  //       },
+  //       bounceTime: 600,
+  //       probeType: 1,
+  //       click: true,
+  //       tap: true
+  //     });
+  //   }
 
-    return () => {
-      if (bScrollRef.current) {
-        bScrollRef.current.destroy();
-        bScrollRef.current = null;
-      }
-    };
-  }, []);
+  //   return () => {
+  //     if (bScrollRef.current) {
+  //       bScrollRef.current.destroy();
+  //       bScrollRef.current = null;
+  //     }
+  //   };
+  // }, []);
 
   const projects: ProjectData[] = [
     {
@@ -315,20 +339,73 @@ export default function Home() {
 
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden">
-      {/* Liquid glass background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#f8f8fb] via-[#f4f4f8] to-[#faf6fb] -z-10" />
-      <div className="fixed inset-0 -z-10">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-tl from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-pink-100/10 via-purple-100/10 to-blue-100/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
-      </div>
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden">      
+      {/* Organic noise background */}
+      <NoiseBackground />
+      <motion.div 
+        className="fixed inset-0 -z-10"
+        style={{ 
+          x: backgroundShiftX, 
+          y: backgroundShiftY 
+        }}
+      >
+        <motion.div 
+          className="absolute top-20 left-20 w-96 h-96 rounded-full blur-3xl"
+          style={{
+            background: useTransform([glowIntensity, tintShift], 
+              ([intensity, tint]: number[]) => 
+                `radial-gradient(circle, rgba(${tint}, ${tint}, 255, ${intensity}) 0%, transparent 60%)`
+            )
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-20 right-20 w-96 h-96 rounded-full blur-3xl"
+          style={{
+            background: useTransform([glowIntensity, tintShift], 
+              ([intensity, tint]: number[]) => 
+                `radial-gradient(circle, rgba(${tint-2}, ${tint-1}, 255, ${intensity * 0.8}) 0%, transparent 60%)`
+            )
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full blur-3xl"
+          style={{
+            background: useTransform([glowIntensity, tintShift], 
+              ([intensity, tint]: number[]) => 
+                `radial-gradient(circle, rgba(${tint-1}, ${tint}, 250, ${intensity * 0.6}) 0%, transparent 70%)`
+            )
+          }}
+        />
+        <motion.div 
+          className="absolute top-1/3 right-1/3 w-80 h-80 rounded-full blur-2xl"
+          style={{
+            background: useTransform([glowIntensity], 
+              ([intensity]: number[]) => 
+                `radial-gradient(circle, rgba(248, 249, 252, ${intensity * 0.9}) 0%, transparent 50%)`
+            )
+          }}
+        />
+        <motion.div 
+          className="absolute bottom-1/3 left-1/3 w-72 h-72 rounded-full blur-2xl"
+          style={{
+            background: useTransform([glowIntensity], 
+              ([intensity]: number[]) => 
+                `radial-gradient(circle, rgba(250, 251, 253, ${intensity * 0.7}) 0%, transparent 50%)`
+            )
+          }}
+        />
+      </motion.div>
       {/* Left Column - Project List */}
       <div className="w-full lg:w-1/2 flex flex-col h-screen">
-        <div ref={scrollRef} className={`flex-1 px-8 lg:px-16 pb-8 overflow-hidden transition-all duration-500 ease-out ${
-          titlePosition === 'top' ? 'pt-64' : 'pt-12 lg:pt-24'
+        {/* Title space when at top */}
+        {titlePosition === 'top' && (
+          <div className="h-64 flex-shrink-0" />
+        )}
+        
+        <div className={`flex-1 px-8 lg:px-16 pb-8 overflow-y-auto transition-all duration-500 ease-out ${
+          titlePosition === 'top' ? 'pt-8' : 'pt-12 lg:pt-24'
         }`}>
-          <div className="space-y-8 lg:space-y-10 max-w-lg mx-auto lg:mx-0">
+          <div className="space-y-2 max-w-lg mx-auto lg:mx-0">
             {projects.map((project, index) => (
               <div
                 key={index}
@@ -411,7 +488,7 @@ export default function Home() {
               }}
             >
               CS and math student at{" "}
-              <span className="text-[#cc35aa] font-medium">MIT</span>
+              <span className="text-[#8A1538] font-medium">MIT</span>
             </motion.h2>
 
             <motion.nav 
@@ -448,22 +525,17 @@ export default function Home() {
       {hoveredProject !== null && (
         <motion.div
           className="fixed z-50 pointer-events-none left-1/2 top-1/2"
-          initial={{ scale: 0, opacity: 0 }}
+          initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0, opacity: 0 }}
+          exit={{ scale: 0.9, opacity: 0 }}
           style={{
             x: popupX,
             y: popupY
           }}
           transition={{
-            scale: {
-              type: "tween",
-              duration: 0.2,
-              ease: "easeOut"
-            },
-            opacity: {
-              duration: 0.15
-            }
+            type: "tween",
+            duration: 0.12,
+            ease: [0.25, 0.46, 0.45, 0.94]
           }}
         >
           <div className="bubble-content rounded-3xl p-10 max-w-md min-w-[380px] relative z-10">

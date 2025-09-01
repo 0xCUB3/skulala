@@ -6,7 +6,10 @@
       "Bash(bun remove:*)",
       "Bash(curl:*)",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "WebFetch(domain:radix-ui.com)",
+      "Bash(npm install:*)",
+      "WebFetch(domain:www.seyityilmaz.com)"
     ],
     "deny": [],
     "ask": []

@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@better-scroll/core": "^2.5.1",
+    "@floating-ui/react": "^0.27.16",
     "framer-motion": "^12.23.12",
     "next": "15.5.2",
     "react": "19.1.0",

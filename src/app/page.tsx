@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { motion, useSpring, useTransform, useMotionValue } from 'framer-motion';
+import { motion, useMotionValue, useTransform } from 'framer-motion';
 import BScroll from '@better-scroll/core';
 
 interface ProjectData {
@@ -18,24 +18,44 @@ export default function Home() {
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
   const [titlePosition, setTitlePosition] = useState<'center' | 'right' | 'top'>('center');
   const [titleOffset, setTitleOffset] = useState<number>(0);
+  const [windowWidth, setWindowWidth] = useState<number>(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const bScrollRef = useRef<BScroll | null>(null);
+  const hoverElementRef = useRef<HTMLDivElement | null>(null);
   
-  // Framer Motion values for cursor-following animation
+  // Mouse tracking for popup movement
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const baseX = useMotionValue(0); // Base X position from row
-  const baseY = useMotionValue(0); // Base Y position from row
   
-  // Spring animation for smooth following at 30% distance with offset
-  const springConfig = { damping: 15, stiffness: 150 };
-  const offsetMouseX = useTransform([mouseX, baseX], ([mouse, base]) => base + (mouse - base) * 0.3 + 60);
-  const popupX = useSpring(offsetMouseX, springConfig);
-  const popupY = useSpring(baseY, springConfig);
-  
-  // Add horizontal wiggle effect only based on cursor movement
-  const rotateZ = useTransform(mouseX, [0, 1600], [-8, 8]);
-  
+  const popupX = useTransform(
+    mouseX, 
+    value => {
+      if (!hoverElementRef.current) return '-50%';
+      const rect = hoverElementRef.current.getBoundingClientRect();
+      const relativeX = value - rect.left - rect.width / 2;
+      const moveAmount = (relativeX / rect.width) * 45; // 75% movement - max 45px horizontal
+      return `calc(-50% + ${moveAmount}px)`;
+    },
+    {
+      ease: [0.25, 0.46, 0.45, 0.94] // Custom bezier curve for smooth movement
+    }
+  );
+
+  const popupY = useTransform(
+    mouseY, 
+    value => {
+      if (!hoverElementRef.current) return '-50%';
+      const rect = hoverElementRef.current.getBoundingClientRect();
+      const relativeY = value - rect.top - rect.height / 2;
+      const moveAmount = (relativeY / rect.height) * 15; // 25% movement - max 15px vertical
+      return `calc(-50% + ${moveAmount}px)`;
+    },
+    {
+      ease: [0.25, 0.46, 0.45, 0.94] // Custom bezier curve for smooth movement
+    }
+  );
+
+  // Track mouse movement when hovering
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
@@ -48,10 +68,11 @@ export default function Home() {
     }
   }, [hoveredProject, mouseX, mouseY]);
 
-  // Handle responsive title positioning with hardcoded date collision
+  // Enhanced responsive title positioning with smooth transitions
   useEffect(() => {
     const updateTitlePosition = () => {
       const width = window.innerWidth;
+      setWindowWidth(width);
       
       if (width < 768) {
         setTitlePosition('top');
@@ -62,12 +83,33 @@ export default function Home() {
         const titleCenterPosition = width / 2;
         const titleWidth = 400; // Approximate title width
         const titleLeftEdge = titleCenterPosition - (titleWidth / 2);
+        const titleRightEdge = titleCenterPosition + (titleWidth / 2);
         
-        if (titleLeftEdge < datesColumnEnd + 150) {
-          // Title is too close, push it right by the collision amount
-          const pushAmount = (datesColumnEnd + 150) - titleLeftEdge;
-          setTitleOffset(pushAmount);
-          setTitlePosition('right');
+        // Check if title collides with dates column or if popups would collide
+        const popupSpaceNeeded = 320; // Space needed for popups to appear next to items
+        const availablePopupSpace = width - (datesColumnEnd + 150); // Space available after dates
+        
+        if (titleLeftEdge < datesColumnEnd + 100) {  // Title collision check
+          // Calculate safe push amount that won't go off-screen
+          const maxSafePush = Math.max(0, width - titleRightEdge - 80); // 80px from right edge
+          const requiredPushAmount = Math.min(
+            (datesColumnEnd + 100) - titleLeftEdge,
+            maxSafePush
+          );
+          
+          // If we can't push enough to avoid collision OR if there's not enough space for popups, go to top
+          if (requiredPushAmount < (datesColumnEnd + 100) - titleLeftEdge || availablePopupSpace < popupSpaceNeeded) {
+            setTitlePosition('top');
+            setTitleOffset(0);
+          } else {
+            // Safe to push right and popups have space
+            setTitleOffset(requiredPushAmount * 0.6);
+            setTitlePosition('right');
+          }
+        } else if (availablePopupSpace < popupSpaceNeeded) {
+          // Even if title doesn't collide, check if popups would have enough space
+          setTitlePosition('top');
+          setTitleOffset(0);
         } else {
           setTitleOffset(0);
           setTitlePosition('center');
@@ -75,9 +117,12 @@ export default function Home() {
       }
     };
 
-    updateTitlePosition();
-    window.addEventListener('resize', updateTitlePosition);
-    return () => window.removeEventListener('resize', updateTitlePosition);
+    // Initialize window width on mount
+    if (typeof window !== 'undefined') {
+      updateTitlePosition();
+      window.addEventListener('resize', updateTitlePosition);
+      return () => window.removeEventListener('resize', updateTitlePosition);
+    }
   }, []);
 
   // Initialize BetterScroll for iOS-like bounce scrolling
@@ -267,22 +312,17 @@ export default function Home() {
   ];
 
 
-  const handleMouseEnter = (index: number, event: React.MouseEvent) => {
-    setHoveredProject(index);
-    const rect = event.currentTarget.getBoundingClientRect();
-    baseX.set(rect.right); // Set base X position to end of row
-    baseY.set(rect.top + rect.height / 2 + 20); // Small offset downward to center the popup
-    mouseX.set(event.clientX); // Set current mouse position
-    mouseY.set(event.clientY);
-  };
-
-  const handleMouseLeave = () => {
-    setHoveredProject(null);
-  };
 
 
   return (
-    <div className="min-h-screen bg-[#f4f4f4] flex flex-col lg:flex-row relative">
+    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden">
+      {/* Liquid glass background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-[#f8f8fb] via-[#f4f4f8] to-[#faf6fb] -z-10" />
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-br from-purple-200/20 to-pink-200/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-tl from-blue-200/20 to-purple-200/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-pink-100/10 via-purple-100/10 to-blue-100/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '4s' }} />
+      </div>
       {/* Left Column - Project List */}
       <div className="w-full lg:w-1/2 flex flex-col h-screen">
         <div ref={scrollRef} className={`flex-1 px-8 lg:px-16 pb-8 overflow-hidden transition-all duration-500 ease-out ${
@@ -293,8 +333,16 @@ export default function Home() {
               <div
                 key={index}
                 className="project-item"
-                onMouseEnter={(e) => handleMouseEnter(index, e)}
-                onMouseLeave={handleMouseLeave}
+                ref={(el) => {
+                  if (hoveredProject === index) {
+                    hoverElementRef.current = el;
+                  }
+                }}
+                onMouseEnter={() => setHoveredProject(index)}
+                onMouseLeave={() => {
+                  setHoveredProject(null);
+                  hoverElementRef.current = null;
+                }}
               >
                 <span className="project-name">{project.name}</span>
                 <span className="project-year">{project.year}</span>
@@ -307,71 +355,123 @@ export default function Home() {
 
       {/* Right Column - Main Content */}
       <div className="w-full lg:w-1/2 relative">
-        <div 
-          className={`fixed transition-all duration-500 ease-out pointer-events-none ${
-            titlePosition === 'top' 
-              ? 'top-8 left-1/2 transform -translate-x-1/2 z-10' 
-              : 'inset-0 flex items-center justify-center'
-          }`}
-          style={{
-            transform: titlePosition !== 'top' ? `translateX(${titleOffset}px)` : undefined
+        <motion.div 
+          className="fixed pointer-events-none z-10"
+          animate={{
+            top: titlePosition === 'top' ? 32 : '50%',
+            left: '50%',
+            x: titlePosition === 'top' 
+              ? '-50%' 
+              : titlePosition === 'right' 
+                ? `calc(-50% + ${Math.min(titleOffset, windowWidth/4)}px)`
+                : '-50%',
+            y: titlePosition === 'top' ? 0 : '-50%'
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 300,
+            damping: 35,
+            mass: 0.8
           }}
         >
-          <div className={`text-left pointer-events-auto ${titlePosition === 'top' ? 'text-center' : ''}`}>
-          <h1 className="text-3xl lg:text-4xl font-light text-[#272727] leading-tight mb-1 lg:mb-2">
-            Alexander Skula,
-          </h1>
-          <h2 className="text-3xl lg:text-4xl font-light text-[#272727] leading-tight mb-6 lg:mb-8">
-            CS and math student at{" "}
-            <span className="text-[#cc35aa] font-medium">MIT</span>
-          </h2>
+          <motion.div 
+            className="text-left pointer-events-auto"
+            animate={{
+              textAlign: titlePosition === 'top' ? 'center' : 'left'
+            }}
+            transition={{
+              type: "spring",
+              stiffness: 400,
+              damping: 40,
+              mass: 0.5
+            }}
+          >
+            <motion.h1 
+              className="text-3xl lg:text-4xl font-light text-[#272727] leading-tight mb-1 lg:mb-2"
+              animate={{
+                scale: titlePosition === 'top' ? 0.9 : 1
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 350,
+                damping: 38
+              }}
+            >
+              Alexander Skula,
+            </motion.h1>
+            <motion.h2 
+              className="text-3xl lg:text-4xl font-light text-[#272727] leading-tight mb-6 lg:mb-8"
+              animate={{
+                scale: titlePosition === 'top' ? 0.9 : 1
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 350,
+                damping: 38
+              }}
+            >
+              CS and math student at{" "}
+              <span className="text-[#cc35aa] font-medium">MIT</span>
+            </motion.h2>
 
-          <nav className={`flex flex-wrap gap-4 lg:gap-6 text-base mb-6 ${titlePosition === 'top' ? 'justify-center' : ''}`}>
-            <a
-              href="mailto:skula@mit.edu"
-              className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
+            <motion.nav 
+              className="flex flex-wrap gap-4 lg:gap-6 text-base mb-6"
+              animate={{
+                justifyContent: titlePosition === 'top' ? 'center' : 'flex-start'
+              }}
+              transition={{
+                type: "spring",
+                stiffness: 400,
+                damping: 40
+              }}
             >
-              Email
-            </a>
-            <a
-              href="https://linkedin.com/in/skula"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
-            >
-              LinkedIn
-            </a>
-          </nav>
-          </div>
-        </div>
+              <a
+                href="mailto:skula@mit.edu"
+                className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
+              >
+                Email
+              </a>
+              <a
+                href="https://linkedin.com/in/skula"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
+              >
+                LinkedIn
+              </a>
+            </motion.nav>
+          </motion.div>
+        </motion.div>
       </div>
 
-      {/* Hover Bubble */}
+      {/* Centered Popup */}
       {hoveredProject !== null && (
         <motion.div
-          className="fixed z-50 pointer-events-none"
-          style={{
-            left: popupX,
-            top: popupY,
-            x: '0%',
-            y: '0%',
-            rotateZ,
-          }}
+          className="fixed z-50 pointer-events-none left-1/2 top-1/2"
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0, opacity: 0 }}
+          style={{
+            x: popupX,
+            y: popupY
+          }}
           transition={{
-            type: "spring",
-            stiffness: 260,
-            damping: 20
+            scale: {
+              type: "tween",
+              duration: 0.2,
+              ease: "easeOut"
+            },
+            opacity: {
+              duration: 0.15
+            }
           }}
         >
-          <div className="bubble-content rounded-xl p-6 max-w-sm min-w-[280px]">
-            <h3 className="font-semibold text-[#272727] text-lg mb-3">
+          <div className="bubble-content rounded-3xl p-10 max-w-md min-w-[380px] relative z-10">
+            <h3 className="font-semibold text-[#1a1a1a] text-2xl mb-4 relative z-10">
               {projects[hoveredProject].name}
             </h3>
 
-            <p className="text-[#979797] text-sm mb-4 leading-relaxed">
+            <p className="text-[#666666] text-base mb-6 leading-relaxed relative z-10">
               {projects[hoveredProject].content.description}
             </p>
 
@@ -389,9 +489,9 @@ export default function Home() {
             )}
 
             {projects[hoveredProject].content.details && (
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {projects[hoveredProject].content.details?.map((detail, idx) => (
-                  <li key={idx} className="text-xs text-[#979797] flex items-start">
+                  <li key={idx} className="text-sm text-[#979797] flex items-start">
                     <span className="text-[#cc35aa] mr-2 mt-0.5">•</span>
                     <span>{detail}</span>
                   </li>

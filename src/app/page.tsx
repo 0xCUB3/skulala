@@ -161,32 +161,31 @@ export default function Home() {
     }
   }, []);
 
-  // Disable BetterScroll - using native scrolling instead
-  // useEffect(() => {
-  //   if (scrollRef.current && !bScrollRef.current) {
-  //     bScrollRef.current = new BScroll(scrollRef.current, {
-  //       scrollY: true,
-  //       scrollX: false,
-  //       bounce: {
-  //         top: true,
-  //         bottom: true,
-  //         left: false,
-  //         right: false
-  //       },
-  //       bounceTime: 600,
-  //       probeType: 1,
-  //       click: true,
-  //       tap: true
-  //     });
-  //   }
+  // Center the list on page load
+  useEffect(() => {
+    const centerList = () => {
+      if (scrollRef.current) {
+        // Use requestAnimationFrame to ensure DOM is ready
+        requestAnimationFrame(() => {
+          if (!scrollRef.current) return;
+          
+          const container = scrollRef.current;
+          // Simple center calculation: scroll to middle of total content
+          const totalScrollHeight = container.scrollHeight;
+          const containerHeight = container.clientHeight;
+          const centerPosition = (totalScrollHeight - containerHeight) / 2;
+          
+          container.scrollTop = centerPosition;
+        });
+      }
+    };
 
-  //   return () => {
-  //     if (bScrollRef.current) {
-  //       bScrollRef.current.destroy();
-  //       bScrollRef.current = null;
-  //     }
-  //   };
-  // }, []);
+    // Center on load and when window resizes
+    setTimeout(centerList, 100); // Small delay to ensure content is rendered
+    
+    window.addEventListener('resize', centerList);
+    return () => window.removeEventListener('resize', centerList);
+  }, []);
 
   const projects: ProjectData[] = [
     {
@@ -314,32 +313,43 @@ export default function Home() {
           <div className="h-64 flex-shrink-0" />
         )}
         
-        <div className={`flex-1 px-8 lg:px-16 pb-8 overflow-y-auto transition-all duration-500 ease-out ${
-          titlePosition === 'top' ? 'pt-8' : 'pt-12 lg:pt-24'
-        }`}>
-          <div className="space-y-2 max-w-lg mx-auto lg:mx-0">
-            {projects.map((project, index) => (
-              <div
-                key={index}
-                className="project-item"
-                ref={(el) => {
-                  if (hoveredProject === index) {
-                    hoverElementRef.current = el;
-                  }
-                }}
-                onMouseEnter={() => setHoveredProject(index)}
-                onMouseLeave={() => {
-                  setHoveredProject(null);
-                  hoverElementRef.current = null;
-                }}
-                onClick={() => handleProjectClick(project.name)}
-              >
-                <span className="project-name">{project.name}</span>
-                <span className="project-year">{project.year}</span>
-              </div>
-            ))}
+        <div 
+          ref={scrollRef}
+          className={`flex-1 px-8 lg:px-16 overflow-y-auto scrollbar-hide transition-all duration-500 ease-out ${
+            titlePosition === 'top' ? 'pt-8' : 'pt-12 lg:pt-24'
+          }`}
+        >
+          {/* Top spacer - sized so last item (Archie) can reach top of viewport */}
+          <div className="flex-shrink-0 top-spacer" style={{ height: 'calc(50vh - 150px)' }}></div>
+          
+          {/* Project list container */}
+          <div className="flex-shrink-0">
+            <div className="space-y-2 max-w-lg mx-auto lg:mx-0 project-list py-16">
+              {projects.map((project, index) => (
+                <div
+                  key={index}
+                  className="project-item"
+                  ref={(el) => {
+                    if (hoveredProject === index) {
+                      hoverElementRef.current = el;
+                    }
+                  }}
+                  onMouseEnter={() => setHoveredProject(index)}
+                  onMouseLeave={() => {
+                    setHoveredProject(null);
+                    hoverElementRef.current = null;
+                  }}
+                  onClick={() => handleProjectClick(project.name)}
+                >
+                  <span className="project-name">{project.name}</span>
+                  <span className="project-year">{project.year}</span>
+                </div>
+              ))}
+            </div>
           </div>
-
+          
+          {/* Bottom spacer - sized so first item (wBlock) can reach bottom of viewport */}
+          <div className="flex-shrink-0 bottom-spacer" style={{ height: 'calc(50vh - 150px)' }}></div>
         </div>
       </div>
 

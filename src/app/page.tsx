@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import BScroll from '@better-scroll/core';
 import NoiseBackground from '@/components/NoiseBackground';
+import { useRouter } from 'next/navigation';
 
 interface ProjectData {
   name: string;
@@ -16,6 +17,7 @@ interface ProjectData {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
   const [titlePosition, setTitlePosition] = useState<'center' | 'right' | 'top'>('center');
   const [titleOffset, setTitleOffset] = useState<number>(0);
@@ -23,6 +25,16 @@ export default function Home() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const bScrollRef = useRef<BScroll | null>(null);
   const hoverElementRef = useRef<HTMLDivElement | null>(null);
+  
+  // Convert project name to URL slug
+  const createSlug = (name: string) => {
+    return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  };
+  
+  const handleProjectClick = (projectName: string) => {
+    const slug = createSlug(projectName);
+    router.push(`/project/${slug}`);
+  };
   
   // Mouse tracking for popup movement and dynamic site effects
   const mouseX = useMotionValue(0);
@@ -420,6 +432,7 @@ export default function Home() {
                   setHoveredProject(null);
                   hoverElementRef.current = null;
                 }}
+                onClick={() => handleProjectClick(project.name)}
               >
                 <span className="project-name">{project.name}</span>
                 <span className="project-year">{project.year}</span>
@@ -564,7 +577,7 @@ export default function Home() {
               <ul className="space-y-3">
                 {projects[hoveredProject].content.details?.map((detail, idx) => (
                   <li key={idx} className="text-sm text-[#979797] flex items-start">
-                    <span className="text-[#cc35aa] mr-2 mt-0.5">•</span>
+                    <span className="text-[#6b7280] mr-2 mt-0.5">•</span>
                     <span>{detail}</span>
                   </li>
                 ))}

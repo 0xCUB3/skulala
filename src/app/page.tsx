@@ -30,7 +30,7 @@ export default function Home() {
   const [titleOffset, setTitleOffset] = useState<number>(0);
   const [windowWidth, setWindowWidth] = useState<number>(0);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const hoverElementRef = useRef<HTMLDivElement | null>(null);
+  const hoverElementRef = useRef<HTMLElement | null>(null);
 
   // Convert project name to URL slug
   const createSlug = (name: string) => {

@@ -14,7 +14,8 @@
       "Bash(npx:*)",
       "Bash(npm run build:*)",
       "Bash(biome check:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

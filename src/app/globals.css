@@ -222,38 +222,48 @@
     display: none;  /* Safari and Chrome */
   }
 
-  /* Native elastic scroll for macOS */
+  /* Universal smooth scrolling that works across all devices */
   .spring-scroll {
     overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
     overscroll-behavior-y: contain;
+    /* Modern browsers */
+    scrollbar-gutter: stable;
+    /* Enhanced trackpad/touch support */
+    touch-action: pan-y;
   }
   
-  /* Force elastic bounce on webkit browsers */
+  /* Safari and webkit browsers */
   @supports (-webkit-overflow-scrolling: touch) {
     .spring-scroll {
       -webkit-overflow-scrolling: touch;
-      overflow-y: scroll;
     }
   }
   
-  .spring-scroll::before,
-  .spring-scroll::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 1px;
-    pointer-events: none;
-    z-index: 9999;
+  /* Firefox momentum scrolling */
+  @supports (scrollbar-width: thin) {
+    .spring-scroll {
+      scroll-behavior: smooth;
+      overscroll-behavior: contain;
+    }
   }
   
-  .spring-scroll::before {
-    top: 0;
+  /* Enhanced smooth scrolling for desktop trackpads */
+  @media (pointer: fine) and (hover: hover) {
+    .spring-scroll {
+      scroll-behavior: smooth;
+      /* Better trackpad momentum on desktop */
+      overscroll-behavior-y: auto;
+    }
   }
   
-  .spring-scroll::after {
-    bottom: 0;
+  /* Touch device optimizations */
+  @media (pointer: coarse) {
+    .spring-scroll {
+      -webkit-overflow-scrolling: touch;
+      touch-action: pan-y;
+      overscroll-behavior-y: contain;
+    }
   }
 
   /* Wave Background Animation */

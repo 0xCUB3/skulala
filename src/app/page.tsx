@@ -1,18 +1,23 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
-import BScroll from '@better-scroll/core';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, useMotionValue, useTransform, useSpring, animate } from 'framer-motion';
 import NoiseBackground from '@/components/NoiseBackground';
 import { useRouter } from 'next/navigation';
 
 interface ProjectData {
   name: string;
   year: string;
+  githubUrl?: string;
   content: {
     description: string;
     images?: string[];
     details?: string[];
+    table?: {
+      title?: string;
+      headers: string[];
+      rows: (string | number)[][];
+    };
   };
 }
 
@@ -23,7 +28,6 @@ export default function Home() {
   const [titleOffset, setTitleOffset] = useState<number>(0);
   const [windowWidth, setWindowWidth] = useState<number>(0);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const bScrollRef = useRef<BScroll | null>(null);
   const hoverElementRef = useRef<HTMLDivElement | null>(null);
   
   // Convert project name to URL slug
@@ -31,9 +35,10 @@ export default function Home() {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   };
   
-  const handleProjectClick = (projectName: string) => {
-    const slug = createSlug(projectName);
-    router.push(`/project/${slug}`);
+  const handleProjectClick = (githubUrl?: string) => {
+    if (githubUrl) {
+      window.open(githubUrl, '_blank');
+    }
   };
   
   // Mouse tracking for popup movement and dynamic site effects
@@ -187,61 +192,107 @@ export default function Home() {
     return () => window.removeEventListener('resize', centerList);
   }, []);
 
+
   const projects: ProjectData[] = [
     {
       name: "wBlock",
       year: "2025",
+      githubUrl: "https://github.com/0xCUB3/wBlock",
       content: {
-        description: "Advanced, privacy-focused, free, and open-source ad blocker built for Safari users."
+        description: "The first-ever fully SwiftUI-native, privacy-focused, power efficient, free, and open-source ad blocker built for Safari users, built to end the drought of fully-functional ad blockers on Apple's flagship browser.",
+        images: [
+          "/projects/wblock/screenshot-1.png",
+        ]
       }
     },
     {
-      name: "Sir-Tim-the-Timely",
+      name: "Sir Tim the Timely",
       year: "2025",
+      githubUrl: "https://github.com/0xCUB3/sir-tim-the-timely",
       content: {
-        description: "A Hikari Discord bot for the MIT Class of 2029 Discord server."
+        description: "A Hikari Discord bot for the MIT Class of 2029 Discord server.",
+        images: [
+          "/projects/sir-tim-the-timely/bot-demo.png"
+        ]
       }
     },
     {
-      name: "Near-Perfect-Tester",
+      name: "Near-Perfect Number Tester",
       year: "2025",
+      githubUrl: "https://github.com/0xCUB3/near-perfect-tester",
       content: {
-        description: "Toolkit to efficiently find k-near perfect numbers. Completed for a research paper that made significant contributions to the study of 2-near perfect numbers."
+        description: "A toolkit to efficiently find k-near perfect numbers extremely efficiently using a modified Sieve of Eratosthenes. Completed for a research paper that made significant contributions to the study of 2-near perfect numbers.",
+        images: [
+        ],
+        table: {
+          title: "Near Perfect Numbers up to 10,000,000 of the form n = 2ᵏ × p²",
+          headers: ["n", "σ(n)", "2n", "diff", "Valid (d₁, d₂) Combinations"],
+          rows: [
+            [18, 39, 36, 3, "+1 +2; +2 +1; +6 -3; +9 -6"],
+            [36, 91, 72, 19, "+1 +18; +18 +1"],
+            [50, 93, 100, -7, "-2 -5; -5 -2"],
+            [196, 399, 392, 7, "+14 -7"],
+            [200, 465, 400, 65, "+25 +40; +40 +25"],
+            [2312, 4605, 4624, -19, "-17 -2; -2 -17"],
+            [15376, 30783, 30752, 31, "+62 -31"],
+            [1032256, 2064639, 2064512, 127, "+254 -127"],
+            [8454272, 16908285, 16908544, -259, "-2 -257; -257 -2"]
+          ]
+        }
       }
     },
     {
       name: "HandMaestro",
       year: "2024",
+      githubUrl: "https://github.com/0xCUB3/handmaestro",
       content: {
-        description: "On-device ASL gesture practice site using TensorFlow."
+        description: "An on-device ASL gesture practice site using TensorFlow.",
+        images: [
+          "/projects/handmaestro/hi.gif",
+        ]
       }
     },
     {
-      name: "Modified-Dots-and-Boxes",
+      name: "Modified Dots and Boxes Engine",
       year: "2024",
+      githubUrl: "https://github.com/0xCUB3/modified-dots-and-boxes",
       content: {
-        description: "Wheel Graph Dots-and-Boxes game for Pygame, complete with winning algorithms for various graph families. Completed for a research paper."
+        description: "A Dots-and-Boxes game for Pygame, complete with winning algorithms for various graph families. Completed for a research paper.",
+        images: [
+          "/projects/modified-dots-and-boxes/dots-and-boxes.gif"
+        ]
       }
     },
     {
       name: "SciTool",
       year: "2024",
+      githubUrl: "https://github.com/0xCUB3/scitool",
       content: {
-        description: "SwiftUI-based scientific calculator and simulator tools for macOS."
-      }
-    },
-    {
-      name: "BetterCamp-macOS",
-      year: "2024",
-      content: {
-        description: "Alternative macOS BootCamp Assistant and patcher."
+        description: "A SwiftUI-based scientific calculator and simulator tools for macOS.",
+        images: [
+          "/projects/scitool/screenshot.png",
+        ]
       }
     },
     {
       name: "Archie",
       year: "2024",
+      githubUrl: "https://github.com/0xCUB3/archie",
       content: {
-        description: "Python Discord bot for checking and reporting Arc forum invite status, built for the Arc Discord server prior to Arc Browser's public release."
+        description: "A Python Discord bot for checking and reporting Arc forum invite status, built for the Arc Discord server prior to Arc Browser's public release.",
+        images: [
+          "/projects/archie/archie.png"
+        ]
+      }
+    },
+    {
+      name: "BetterCamp-macOS",
+      year: "2023",
+      githubUrl: "https://github.com/0xCUB3/bettercamp-macos",
+      content: {
+        description: "An alternative to the deprecated macOS BootCamp Assistant and patcher.",
+        images: [
+        ]
       }
     },
   ];
@@ -315,12 +366,12 @@ export default function Home() {
         
         <div 
           ref={scrollRef}
-          className={`flex-1 px-8 lg:px-16 overflow-y-auto scrollbar-hide transition-all duration-500 ease-out ${
+          className={`flex-1 px-8 lg:px-16 overflow-y-scroll scrollbar-hide spring-scroll ${
             titlePosition === 'top' ? 'pt-8' : 'pt-12 lg:pt-24'
           }`}
         >
           {/* Top spacer - sized so last item (Archie) can reach top of viewport */}
-          <div className="flex-shrink-0 top-spacer" style={{ height: 'calc(50vh - 150px)' }}></div>
+          <div className="flex-shrink-0 top-spacer" style={{ height: 'calc(50vh + 100px)' }}></div>
           
           {/* Project list container */}
           <div className="flex-shrink-0">
@@ -328,7 +379,7 @@ export default function Home() {
               {projects.map((project, index) => (
                 <div
                   key={index}
-                  className="project-item"
+                  className="project-item group"
                   ref={(el) => {
                     if (hoveredProject === index) {
                       hoverElementRef.current = el;
@@ -339,9 +390,22 @@ export default function Home() {
                     setHoveredProject(null);
                     hoverElementRef.current = null;
                   }}
-                  onClick={() => handleProjectClick(project.name)}
+                  onClick={() => handleProjectClick(project.githubUrl)}
+                  style={{ cursor: project.githubUrl ? 'pointer' : 'default' }}
                 >
-                  <span className="project-name">{project.name}</span>
+                  <span className="project-name flex items-center gap-2">
+                    {project.name}
+                    {project.githubUrl && (
+                      <svg 
+                        className="w-3.5 h-3.5 opacity-0 group-hover:opacity-40 transition-opacity duration-200" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    )}
+                  </span>
                   <span className="project-year">{project.year}</span>
                 </div>
               ))}
@@ -349,7 +413,7 @@ export default function Home() {
           </div>
           
           {/* Bottom spacer - sized so first item (wBlock) can reach bottom of viewport */}
-          <div className="flex-shrink-0 bottom-spacer" style={{ height: 'calc(50vh - 150px)' }}></div>
+          <div className="flex-shrink-0 bottom-spacer" style={{ height: 'calc(50vh + 100px)' }}></div>
         </div>
       </div>
 
@@ -432,6 +496,14 @@ export default function Home() {
                 Email
               </a>
               <a
+                href="https://github.com/0xCUB3"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
+              >
+                GitHub
+              </a>
+              <a
                 href="https://linkedin.com/in/skula"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -461,7 +533,9 @@ export default function Home() {
             ease: [0.25, 0.46, 0.45, 0.94]
           }}
         >
-          <div className="bubble-content rounded-3xl p-10 max-w-md min-w-[380px] relative z-10">
+          <div className={`bubble-content rounded-3xl p-10 min-w-[380px] relative z-10 ${
+            projects[hoveredProject].content.table ? 'max-w-3xl' : 'max-w-md'
+          }`}>
             <h3 className="font-semibold text-[#1a1a1a] text-2xl mb-4 relative z-10">
               {projects[hoveredProject].name}
             </h3>
@@ -471,15 +545,59 @@ export default function Home() {
             </p>
 
             {projects[hoveredProject].content.images && (
-              <div className="mb-4">
+              <div className="mb-6 space-y-3">
                 {projects[hoveredProject].content.images?.map((image, idx) => (
-                  <img
-                    key={idx}
-                    src={image}
-                    alt={projects[hoveredProject].name}
-                    className="w-full rounded-lg border border-gray-100 shadow-sm"
-                  />
+                  <div key={idx} className="relative overflow-hidden rounded-2xl">
+                    <img
+                      src={image}
+                      alt={projects[hoveredProject].name}
+                      className="w-full block"
+                      style={{
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)',
+                        border: '1px solid rgba(0, 0, 0, 0.04)'
+                      }}
+                    />
+                  </div>
                 ))}
+              </div>
+            )}
+
+            {projects[hoveredProject].content.table && (
+              <div className="mb-6">
+                {projects[hoveredProject].content.table.title && (
+                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">
+                    {projects[hoveredProject].content.table.title}
+                  </h4>
+                )}
+                <div className="overflow-x-auto rounded-lg border border-gray-100">
+                  <table className="w-full text-xs">
+                    <thead className="bg-gray-50/50">
+                      <tr>
+                        {projects[hoveredProject].content.table.headers.map((header, idx) => (
+                          <th key={idx} className={`px-3 py-2 text-left font-medium text-[#666666] border-b border-gray-100 ${
+                            idx === projects[hoveredProject].content.table.headers.length - 1 ? 'min-w-[200px]' : ''
+                          }`}>
+                            {header}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white/50 divide-y divide-gray-100">
+                      {projects[hoveredProject].content.table.rows.map((row, rowIdx) => (
+                        <tr key={rowIdx} className="hover:bg-gray-50/50 transition-colors">
+                          {row.map((cell, cellIdx) => (
+                            <td key={cellIdx} className={`px-3 py-2 text-[#666666] ${
+                              cellIdx === row.length - 1 ? '' : 'whitespace-nowrap'
+                            }`}>
+                              {typeof cell === 'number' ? cell.toLocaleString() : cell}
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 

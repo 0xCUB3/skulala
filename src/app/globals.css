@@ -222,6 +222,40 @@
     display: none;  /* Safari and Chrome */
   }
 
+  /* Native elastic scroll for macOS */
+  .spring-scroll {
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+  
+  /* Force elastic bounce on webkit browsers */
+  @supports (-webkit-overflow-scrolling: touch) {
+    .spring-scroll {
+      -webkit-overflow-scrolling: touch;
+      overflow-y: scroll;
+    }
+  }
+  
+  .spring-scroll::before,
+  .spring-scroll::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    pointer-events: none;
+    z-index: 9999;
+  }
+  
+  .spring-scroll::before {
+    top: 0;
+  }
+  
+  .spring-scroll::after {
+    bottom: 0;
+  }
+
   /* Wave Background Animation */
   .wave-background {
     background: linear-gradient(

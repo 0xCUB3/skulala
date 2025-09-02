@@ -71,7 +71,7 @@ export default function Home() {
   
   const popupX = useTransform(
     mouseX, 
-    value => {
+    (value: number) => {
       if (!hoverElementRef.current) return '-50%';
       const rect = hoverElementRef.current.getBoundingClientRect();
       const relativeX = value - rect.left - rect.width / 2;
@@ -85,7 +85,7 @@ export default function Home() {
 
   const popupY = useTransform(
     mouseY, 
-    value => {
+    (value: number) => {
       if (!hoverElementRef.current) return '-50%';
       const rect = hoverElementRef.current.getBoundingClientRect();
       const relativeY = value - rect.top - rect.height / 2;
@@ -576,7 +576,7 @@ export default function Home() {
                       <tr>
                         {projects[hoveredProject].content.table.headers.map((header, idx) => (
                           <th key={idx} className={`px-3 py-2 text-left font-medium text-[#666666] border-b border-gray-100 ${
-                            idx === projects[hoveredProject].content.table.headers.length - 1 ? 'min-w-[200px]' : ''
+                            idx === (projects[hoveredProject].content.table?.headers.length || 0) - 1 ? 'min-w-[200px]' : ''
                           }`}>
                             {header}
                           </th>

@@ -9,7 +9,8 @@
       "mcp__context7__get-library-docs",
       "WebFetch(domain:radix-ui.com)",
       "Bash(npm install:*)",
-      "WebFetch(domain:www.seyityilmaz.com)"
+      "WebFetch(domain:www.seyityilmaz.com)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "ask": []

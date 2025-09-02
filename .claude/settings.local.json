@@ -10,7 +10,10 @@
       "WebFetch(domain:radix-ui.com)",
       "Bash(npm install:*)",
       "WebFetch(domain:www.seyityilmaz.com)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(npx:*)",
+      "Bash(npm run build:*)",
+      "Bash(biome check:*)"
     ],
     "deny": [],
     "ask": []

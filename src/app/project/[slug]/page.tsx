@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useParams, useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import NoiseBackground from '@/components/NoiseBackground';
+import { motion } from "framer-motion";
+import { useParams, useRouter } from "next/navigation";
+import NoiseBackground from "@/components/NoiseBackground";
 
 export default function ProjectPage() {
   const params = useParams();
@@ -11,23 +11,24 @@ export default function ProjectPage() {
 
   // Convert slug back to project name for display
   const projectName = slug
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
       {/* Organic noise background */}
       <NoiseBackground />
-      
+
       {/* Back button */}
       <motion.button
-        onClick={() => router.push('/')}
+        onClick={() => router.push("/")}
         className="fixed top-8 left-8 z-50 px-6 py-3 rounded-full"
         style={{
-          background: 'linear-gradient(135deg, rgba(248, 249, 250, 0.35) 0%, rgba(250, 251, 252, 0.42) 100%)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.5)',
+          background:
+            "linear-gradient(135deg, rgba(248, 249, 250, 0.35) 0%, rgba(250, 251, 252, 0.42) 100%)",
+          backdropFilter: "blur(16px)",
+          border: "1px solid rgba(255, 255, 255, 0.5)",
         }}
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}

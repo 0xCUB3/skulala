@@ -534,6 +534,14 @@ export default function Home() {
               >
                 LinkedIn
               </a>
+              <a
+                href="/resume"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
+              >
+                Resume
+              </a>
             </motion.nav>
           </motion.div>
         </motion.div>

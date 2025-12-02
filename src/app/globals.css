@@ -1,323 +1,404 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Satoshi:wght@300;400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Satoshi:wght@300;400;500;600&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Subtle Liquid Glass Variables */
-    --shadow-offset: 0;
-    --shadow-blur: 20px;
-    --shadow-spread: -8px;
-    --shadow-color: rgba(255, 255, 255, 0.3);
-    --tint-color: 248, 249, 250;
-    --tint-opacity: 0.08;
-    --frost-blur: 16px;
-    --outer-shadow-blur: 24px;
-    --subtle-accent: 250, 251, 252;
-    
-    /* Wave Animation Variables */
-    --wave-1: #fafbfc;
-    --wave-2: #f8f9fa;
-    --wave-3: #f6f7f8;
-    --wave-4: #f4f5f6;
-    --wave-5: #f2f3f4;
-  }
-  
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    font-feature-settings: 'kern', 'liga', 'clig', 'calt';
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-weight: 450; /* Slightly thicker than normal (400) */
-  }
-  
-  /* Main content (name, title, links) uses Satoshi for a warmer feel */
-  h1, h2, nav a {
-    font-family: 'Satoshi', 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  }
+    :root {
+        /* Theme Colors - Light Mode */
+        --text-primary: #272727;
+        --text-secondary: #979797;
+        --text-accent: #8a1538;
+        --text-hover: #6b7280;
+        --bg-base: 248, 249, 250;
+
+        /* Subtle Liquid Glass Variables */
+        --shadow-offset: 0;
+        --shadow-blur: 20px;
+        --shadow-spread: -8px;
+        --shadow-color: rgba(255, 255, 255, 0.3);
+        --tint-color: 248, 249, 250;
+        --tint-opacity: 0.08;
+        --frost-blur: 16px;
+        --outer-shadow-blur: 24px;
+        --subtle-accent: 250, 251, 252;
+
+        /* Wave Animation Variables */
+        --wave-1: #fafbfc;
+        --wave-2: #f8f9fa;
+        --wave-3: #f6f7f8;
+        --wave-4: #f4f5f6;
+        --wave-5: #f2f3f4;
+
+        /* Popup/Bubble Colors */
+        --bubble-text: #1a1a1a;
+        --bubble-text-secondary: #666666;
+        --bubble-border: rgba(255, 255, 255, 0.5);
+    }
+
+    .dark {
+        /* Theme Colors - Dark Mode */
+        --text-primary: #e5e5e5;
+        --text-secondary: #a1a1a1;
+        --text-accent: #ff6b8a;
+        --text-hover: #d1d5db;
+        --bg-base: 18, 18, 22;
+
+        /* Subtle Liquid Glass Variables - Dark */
+        --shadow-color: rgba(0, 0, 0, 0.3);
+        --tint-color: 30, 30, 38;
+        --tint-opacity: 0.12;
+        --subtle-accent: 40, 40, 50;
+
+        /* Wave Animation Variables - Dark */
+        --wave-1: #121216;
+        --wave-2: #16161c;
+        --wave-3: #1a1a22;
+        --wave-4: #1e1e28;
+        --wave-5: #22222e;
+
+        /* Popup/Bubble Colors - Dark */
+        --bubble-text: #f0f0f0;
+        --bubble-text-secondary: #a0a0a0;
+        --bubble-border: rgba(255, 255, 255, 0.1);
+
+        /* Dark mode shadows */
+        --outer-glow: rgba(100, 100, 140, 0.15);
+        --item-shadow: rgba(0, 0, 0, 0.3);
+    }
+
+    :root {
+        --outer-glow: rgba(248, 249, 250, 0.2);
+        --item-shadow: rgba(0, 0, 0, 0.08);
+    }
+
+    /* Hide scrollbar globally but keep native scroll behavior */
+    html {
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE/Edge */
+        scroll-behavior: smooth;
+    }
+
+    html::-webkit-scrollbar {
+        display: none; /* Chrome/Safari/Opera */
+    }
+
+    body {
+        font-family:
+            "Inter",
+            -apple-system,
+            BlinkMacSystemFont,
+            system-ui,
+            sans-serif;
+        font-feature-settings: "kern", "liga", "clig", "calt";
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-weight: 450; /* Slightly thicker than normal (400) */
+        /* Allow native overscroll bounce on macOS/iOS */
+        overscroll-behavior-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Main content (name, title, links) uses Satoshi for a warmer feel */
+    h1,
+    h2,
+    nav a {
+        font-family:
+            "Satoshi",
+            "Inter",
+            -apple-system,
+            BlinkMacSystemFont,
+            system-ui,
+            sans-serif;
+    }
 }
 
 @layer components {
-  .project-item {
-    @apply flex cursor-pointer transition-all duration-300 ease-out;
-    align-items: center;
-    position: relative;
-    z-index: 1;
-    padding: 12px 0; /* Add vertical padding for larger clickable area */
-    margin: 4px 0; /* Add vertical margin for better spacing */
-  }
-
-  .project-item::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: -20px;
-    right: -20px;
-    height: 0;
-    background: linear-gradient(
-      135deg,
-      rgba(var(--tint-color), 0.12) 0%,
-      rgba(var(--tint-color), 0.08) 40%,
-      rgba(var(--subtle-accent), 0.1) 100%
-    );
-    backdrop-filter: blur(var(--frost-blur)) saturate(150%);
-    border-radius: 20px;
-    transform: translateY(-50%) scale(0.95, 0);
-    opacity: 0;
-    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-    z-index: -1;
-    box-shadow:
-      inset var(--shadow-offset) var(--shadow-offset) var(--shadow-blur) var(--shadow-spread) var(--shadow-color),
-      0 var(--outer-shadow-blur) 60px -20px rgba(248, 249, 250, 0.2),
-      0 8px 32px -8px rgba(0, 0, 0, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  }
-
-  .project-item:hover::before {
-    height: calc(100% + 16px);
-    opacity: 1;
-    transform: translateY(-50%) scale(1.02, 1);
-  }
-  
-
-  .project-item:hover {
-    transform: none;
-  }
-
-  .project-name {
-    @apply text-[#272727] text-lg transition-all duration-300 ease-out;
-    font-weight: 450; /* Slightly thicker */
-    letter-spacing: -0.01em;
-    flex: 1;
-  }
-
-  .project-item:hover .project-name {
-    @apply text-[#6b7280];
-    font-weight: 500;
-  }
-
-  .project-year {
-    @apply text-[#979797] font-normal text-lg transition-all duration-300 ease-out;
-    font-weight: 300;
-    letter-spacing: -0.01em;
-    margin-left: 0.75rem; /* Much closer to titles */
-    min-width: 60px;
-    text-align: right;
-  }
-
-  .hover-bubble {
-    animation: genie-appear 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    transform-origin: left center;
-  }
-
-  @keyframes genie-appear {
-    0% {
-      opacity: 0;
-      transform: scale(0.3) translateY(-50%) translateX(-20px);
-      filter: blur(2px);
+    .project-item {
+        @apply flex cursor-pointer transition-all duration-300 ease-out;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+        padding: 12px 0; /* Add vertical padding for larger clickable area */
+        margin: 4px 0; /* Add vertical margin for better spacing */
     }
-    50% {
-      opacity: 0.8;
-      transform: scale(1.05) translateY(-50%) translateX(0px);
-      filter: blur(0px);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1) translateY(-50%) translateX(0px);
-      filter: blur(0px);
-    }
-  }
 
-  .hover-bubble-exit {
-    animation: genie-disappear 0.2s cubic-bezier(0.55, 0.055, 0.675, 0.19) forwards;
-  }
-
-  @keyframes genie-disappear {
-    0% {
-      opacity: 1;
-      transform: scale(1) translateY(-50%) translateX(0px);
+    .project-item::before {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: -20px;
+        right: -20px;
+        height: 0;
+        background: linear-gradient(
+            135deg,
+            rgba(var(--tint-color), 0.12) 0%,
+            rgba(var(--tint-color), 0.08) 40%,
+            rgba(var(--subtle-accent), 0.1) 100%
+        );
+        backdrop-filter: blur(var(--frost-blur)) saturate(150%);
+        border-radius: 20px;
+        transform: translateY(-50%) scale(0.95, 0);
+        opacity: 0;
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: -1;
+        box-shadow:
+            inset var(--shadow-offset) var(--shadow-offset) var(--shadow-blur)
+                var(--shadow-spread) var(--shadow-color),
+            0 var(--outer-shadow-blur) 60px -20px var(--outer-glow),
+            0 8px 32px -8px var(--item-shadow),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
     }
-    100% {
-      opacity: 0;
-      transform: scale(0.8) translateY(-50%) translateX(-10px);
-      filter: blur(1px);
-    }
-  }
 
-  .bubble-content {
-    backdrop-filter: blur(var(--frost-blur)) saturate(180%);
-    background: linear-gradient(
-      135deg,
-      rgba(var(--tint-color), 0.35) 0%,
-      rgba(var(--tint-color), 0.28) 50%,
-      rgba(var(--subtle-accent), 0.42) 100%
-    );
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow:
-      inset var(--shadow-offset) var(--shadow-offset) var(--shadow-blur) var(--shadow-spread) var(--shadow-color),
-      0 var(--outer-shadow-blur) 80px -12px rgba(248, 249, 250, 0.4),
-      0 18px 36px -18px rgba(0, 0, 0, 0.15),
-      0 -12px 36px -8px rgba(0, 0, 0, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.4);
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-  }
-  
-  .bubble-content::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(
-      circle at 30% 20%,
-      rgba(248, 249, 250, 0.15) 0%,
-      rgba(250, 251, 252, 0.08) 40%,
-      transparent 70%
-    );
-    pointer-events: none;
-  }
-  
-  .bubble-content::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(
-      circle at center,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.1) 40%,
-      rgba(255, 255, 255, 0) 60%
-    );
-    animation: bubble-shimmer 3s ease-in-out infinite;
-    pointer-events: none;
-  }
-  
-  @keyframes bubble-shimmer {
-    0%, 100% {
-      transform: translate(-30%, -30%) scale(1);
-      opacity: 0.5;
+    .project-item:hover::before {
+        height: calc(100% + 16px);
+        opacity: 1;
+        transform: translateY(-50%) scale(1.02, 1);
     }
-    50% {
-      transform: translate(30%, 30%) scale(1.1);
-      opacity: 0.8;
+
+    .project-item:hover {
+        transform: none;
     }
-  }
 
-  .scrollbar-hide {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
-  }
-  
-  .scrollbar-hide::-webkit-scrollbar { 
-    display: none;  /* Safari and Chrome */
-  }
+    .project-name {
+        @apply text-lg transition-all duration-300 ease-out;
+        color: var(--text-primary);
+        font-weight: 450; /* Slightly thicker */
+        letter-spacing: -0.01em;
+        flex: 1;
+    }
 
-  /* Universal smooth scrolling that works across all devices */
-  .spring-scroll {
-    overflow-y: scroll;
-    scroll-behavior: smooth;
-    overscroll-behavior-y: contain;
-    /* Modern browsers */
-    scrollbar-gutter: stable;
-    /* Enhanced trackpad/touch support */
-    touch-action: pan-y;
-  }
-  
-  /* Safari and webkit browsers */
-  @supports (-webkit-overflow-scrolling: touch) {
+    .project-item:hover .project-name {
+        color: var(--text-hover);
+        font-weight: 500;
+    }
+
+    .project-year {
+        @apply font-normal text-lg transition-all duration-300 ease-out;
+        color: var(--text-secondary);
+        font-weight: 300;
+        letter-spacing: -0.01em;
+        margin-left: 0.75rem; /* Much closer to titles */
+        min-width: 60px;
+        text-align: right;
+    }
+
+    .hover-bubble {
+        animation: genie-appear 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
+            forwards;
+        transform-origin: left center;
+    }
+
+    @keyframes genie-appear {
+        0% {
+            opacity: 0;
+            transform: scale(0.3) translateY(-50%) translateX(-20px);
+            filter: blur(2px);
+        }
+        50% {
+            opacity: 0.8;
+            transform: scale(1.05) translateY(-50%) translateX(0px);
+            filter: blur(0px);
+        }
+        100% {
+            opacity: 1;
+            transform: scale(1) translateY(-50%) translateX(0px);
+            filter: blur(0px);
+        }
+    }
+
+    .hover-bubble-exit {
+        animation: genie-disappear 0.2s cubic-bezier(0.55, 0.055, 0.675, 0.19)
+            forwards;
+    }
+
+    @keyframes genie-disappear {
+        0% {
+            opacity: 1;
+            transform: scale(1) translateY(-50%) translateX(0px);
+        }
+        100% {
+            opacity: 0;
+            transform: scale(0.8) translateY(-50%) translateX(-10px);
+            filter: blur(1px);
+        }
+    }
+
+    .bubble-content {
+        backdrop-filter: blur(var(--frost-blur)) saturate(180%);
+        background: linear-gradient(
+            135deg,
+            rgba(var(--tint-color), 0.35) 0%,
+            rgba(var(--tint-color), 0.28) 50%,
+            rgba(var(--subtle-accent), 0.42) 100%
+        );
+        border: 1px solid var(--bubble-border);
+        box-shadow:
+            inset var(--shadow-offset) var(--shadow-offset) var(--shadow-blur)
+                var(--shadow-spread) var(--shadow-color),
+            0 var(--outer-shadow-blur) 80px -12px rgba(248, 249, 250, 0.4),
+            0 18px 36px -18px rgba(0, 0, 0, 0.15),
+            0 -12px 36px -8px rgba(0, 0, 0, 0.05),
+            inset 0 1px 0 rgba(255, 255, 255, 0.8),
+            inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+    }
+
+    .bubble-content::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(
+            circle at 30% 20%,
+            rgba(248, 249, 250, 0.15) 0%,
+            rgba(250, 251, 252, 0.08) 40%,
+            transparent 70%
+        );
+        pointer-events: none;
+    }
+
+    .bubble-content::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(
+            circle at center,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.1) 40%,
+            rgba(255, 255, 255, 0) 60%
+        );
+        animation: bubble-shimmer 3s ease-in-out infinite;
+        pointer-events: none;
+    }
+
+    @keyframes bubble-shimmer {
+        0%,
+        100% {
+            transform: translate(-30%, -30%) scale(1);
+            opacity: 0.5;
+        }
+        50% {
+            transform: translate(30%, 30%) scale(1.1);
+            opacity: 0.8;
+        }
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none; /* Safari and Chrome */
+    }
+
+    /* Universal smooth scrolling that works across all devices */
     .spring-scroll {
-      -webkit-overflow-scrolling: touch;
+        overflow-y: scroll;
+        scroll-behavior: smooth;
+        overscroll-behavior-y: contain;
+        /* Modern browsers */
+        scrollbar-gutter: stable;
+        /* Enhanced trackpad/touch support */
+        touch-action: pan-y;
     }
-  }
-  
-  /* Firefox momentum scrolling */
-  @supports (scrollbar-width: thin) {
-    .spring-scroll {
-      scroll-behavior: smooth;
-      overscroll-behavior: contain;
-    }
-  }
-  
-  /* Enhanced smooth scrolling for desktop trackpads */
-  @media (pointer: fine) and (hover: hover) {
-    .spring-scroll {
-      scroll-behavior: smooth;
-      /* Better trackpad momentum on desktop */
-      overscroll-behavior-y: auto;
-    }
-  }
-  
-  /* Touch device optimizations */
-  @media (pointer: coarse) {
-    .spring-scroll {
-      -webkit-overflow-scrolling: touch;
-      touch-action: pan-y;
-      overscroll-behavior-y: contain;
-    }
-  }
 
-  /* Wave Background Animation */
-  .wave-background {
-    background: linear-gradient(
-      45deg,
-      var(--wave-1) 0%,
-      var(--wave-2) 25%,
-      var(--wave-3) 50%,
-      var(--wave-4) 75%,
-      var(--wave-5) 100%
-    );
-    background-size: 400% 400%;
-    animation: waveGradient 12s ease-in-out infinite;
-  }
-  
-  @keyframes waveGradient {
-    0% {
-      background-position: 0% 50%;
+    /* Safari and webkit browsers */
+    @supports (-webkit-overflow-scrolling: touch) {
+        .spring-scroll {
+            -webkit-overflow-scrolling: touch;
+        }
     }
-    25% {
-      background-position: 100% 0%;
+
+    /* Firefox momentum scrolling */
+    @supports (scrollbar-width: thin) {
+        .spring-scroll {
+            scroll-behavior: smooth;
+            overscroll-behavior: contain;
+        }
     }
-    50% {
-      background-position: 50% 100%;
+
+    /* Enhanced smooth scrolling for desktop trackpads */
+    @media (pointer: fine) and (hover: hover) {
+        .spring-scroll {
+            scroll-behavior: smooth;
+            /* Better trackpad momentum on desktop */
+            overscroll-behavior-y: auto;
+        }
     }
-    75% {
-      background-position: 0% 50%;
+
+    /* Touch device optimizations */
+    @media (pointer: coarse) {
+        .spring-scroll {
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
+            overscroll-behavior-y: contain;
+        }
     }
-    100% {
-      background-position: 0% 50%;
+
+    /* Wave Background Animation */
+    .wave-background {
+        background: linear-gradient(
+            45deg,
+            var(--wave-1) 0%,
+            var(--wave-2) 25%,
+            var(--wave-3) 50%,
+            var(--wave-4) 75%,
+            var(--wave-5) 100%
+        );
+        background-size: 400% 400%;
+        animation: waveGradient 12s ease-in-out infinite;
     }
-  }
-  
-  /* Subtle wave overlay */
-  .wave-overlay {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(248, 249, 250, 0.3) 25%,
-      rgba(250, 251, 252, 0.4) 50%,
-      rgba(248, 249, 250, 0.3) 75%,
-      transparent 100%
-    );
-    background-size: 200% 100%;
-    animation: waveFlow 8s linear infinite;
-  }
-  
-  @keyframes waveFlow {
-    0% {
-      background-position: -200% 0%;
+
+    @keyframes waveGradient {
+        0% {
+            background-position: 0% 50%;
+        }
+        25% {
+            background-position: 100% 0%;
+        }
+        50% {
+            background-position: 50% 100%;
+        }
+        75% {
+            background-position: 0% 50%;
+        }
+        100% {
+            background-position: 0% 50%;
+        }
     }
-    100% {
-      background-position: 200% 0%;
+
+    /* Subtle wave overlay */
+    .wave-overlay {
+        background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(248, 249, 250, 0.3) 25%,
+            rgba(250, 251, 252, 0.4) 50%,
+            rgba(248, 249, 250, 0.3) 75%,
+            transparent 100%
+        );
+        background-size: 200% 100%;
+        animation: waveFlow 8s linear infinite;
     }
-  }
+
+    @keyframes waveFlow {
+        0% {
+            background-position: -200% 0%;
+        }
+        100% {
+            background-position: 200% 0%;
+        }
+    }
 }

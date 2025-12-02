@@ -2,8 +2,17 @@
 
 import { motion, useMotionValue, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useRef, useState } from "react";
 import NoiseBackground from "@/components/NoiseBackground";
+import { ThemeToggle } from "@/components/ThemeToggle";
+
+// Bubbly spring configurations
+const springConfigs = {
+  bouncy: { type: "spring" as const, stiffness: 400, damping: 15 },
+  wobbly: { type: "spring" as const, stiffness: 300, damping: 18 },
+  snappy: { type: "spring" as const, stiffness: 500, damping: 25 },
+};
 
 interface ProjectData {
   name: string;
@@ -23,14 +32,23 @@ interface ProjectData {
 
 export default function Home() {
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
   const [hoveredProject, setHoveredProject] = useState<number | null>(null);
   const [titlePosition, setTitlePosition] = useState<
     "center" | "right" | "top"
   >("center");
   const [titleOffset, setTitleOffset] = useState<number>(0);
   const [windowWidth, setWindowWidth] = useState<number>(0);
+  const [mounted, setMounted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const hoverElementRef = useRef<HTMLElement | null>(null);
+
+  // Handle hydration
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === "dark";
 
   // Convert project name to URL slug
   const createSlug = (name: string) => {
@@ -185,20 +203,18 @@ export default function Home() {
   // Center the list on page load
   useEffect(() => {
     const centerList = () => {
-      if (scrollRef.current) {
-        // Use requestAnimationFrame to ensure DOM is ready
-        requestAnimationFrame(() => {
-          if (!scrollRef.current) return;
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        // Calculate center position based on document height
+        const totalScrollHeight = document.documentElement.scrollHeight;
+        const viewportHeight = window.innerHeight;
+        const centerPosition = (totalScrollHeight - viewportHeight) / 2;
 
-          const container = scrollRef.current;
-          // Simple center calculation: scroll to middle of total content
-          const totalScrollHeight = container.scrollHeight;
-          const containerHeight = container.clientHeight;
-          const centerPosition = (totalScrollHeight - containerHeight) / 2;
-
-          container.scrollTop = centerPosition;
+        window.scrollTo({
+          top: centerPosition,
+          behavior: "instant",
         });
-      }
+      });
     };
 
     // Center on load and when window resizes
@@ -317,7 +333,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden">
+    <div className="min-h-screen flex flex-col lg:flex-row relative">
       {/* Organic noise background */}
       <NoiseBackground />
       <motion.div
@@ -379,24 +395,24 @@ export default function Home() {
         />
       </motion.div>
       {/* Left Column - Project List */}
-      <div className="w-full lg:w-1/2 flex flex-col h-screen">
+      <div className="w-full lg:w-1/2">
         {/* Title space when at top */}
-        {titlePosition === "top" && <div className="h-64 flex-shrink-0" />}
+        {titlePosition === "top" && <div className="h-64" />}
 
         <div
           ref={scrollRef}
-          className={`flex-1 px-8 lg:px-16 overflow-y-scroll scrollbar-hide spring-scroll ${
+          className={`px-8 lg:px-16 ${
             titlePosition === "top" ? "pt-8" : "pt-12 lg:pt-24"
           }`}
         >
-          {/* Top spacer - sized so last item (Archie) can reach top of viewport */}
+          {/* Top spacer - sized so last item can reach top of viewport */}
           <div
-            className="flex-shrink-0 top-spacer"
+            className="top-spacer"
             style={{ height: "calc(50vh + 100px)" }}
           ></div>
 
           {/* Project list container */}
-          <div className="flex-shrink-0">
+          <div>
             <div className="space-y-2 max-w-lg mx-auto lg:mx-0 project-list py-16">
               {projects.map((project, index) => (
                 <button
@@ -419,11 +435,13 @@ export default function Home() {
                   <span className="project-name flex items-center gap-2">
                     {project.name}
                     {project.githubUrl && (
-                      <svg
+                      <motion.svg
                         className="w-3.5 h-3.5 opacity-0 group-hover:opacity-40 transition-opacity duration-200"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
+                        whileHover={{ scale: 1.2, rotate: 5 }}
+                        transition={springConfigs.bouncy}
                       >
                         <path
                           strokeLinecap="round"
@@ -431,7 +449,7 @@ export default function Home() {
                           strokeWidth={2}
                           d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
                         />
-                      </svg>
+                      </motion.svg>
                     )}
                   </span>
                   <span className="project-year">{project.year}</span>
@@ -440,9 +458,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Bottom spacer - sized so first item (wBlock) can reach bottom of viewport */}
+          {/* Bottom spacer - sized so first item can reach bottom of viewport */}
           <div
-            className="flex-shrink-0 bottom-spacer"
+            className="bottom-spacer"
             style={{ height: "calc(50vh + 100px)" }}
           ></div>
         </div>
@@ -483,75 +501,100 @@ export default function Home() {
             }}
           >
             <motion.h1
-              className="text-3xl lg:text-4xl font-bold text-[#272727] leading-tight mb-1 lg:mb-2"
+              className="text-3xl lg:text-4xl font-bold leading-tight mb-1 lg:mb-2"
+              style={{ color: "var(--text-primary)" }}
               animate={{
                 scale: titlePosition === "top" ? 0.9 : 1,
+                y: [0, -3, 0],
               }}
               transition={{
-                type: "spring",
-                stiffness: 350,
-                damping: 38,
+                scale: springConfigs.bouncy,
+                y: {
+                  duration: 4,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "easeInOut",
+                },
               }}
             >
               Alexander Skula,
             </motion.h1>
             <motion.h2
-              className="text-3xl lg:text-4xl font-bold text-[#272727] leading-tight mb-6 lg:mb-8"
+              className="text-3xl lg:text-4xl font-bold leading-tight mb-6 lg:mb-8"
+              style={{ color: "var(--text-primary)" }}
               animate={{
                 scale: titlePosition === "top" ? 0.9 : 1,
+                y: [0, -3, 0],
               }}
               transition={{
-                type: "spring",
-                stiffness: 350,
-                damping: 38,
+                scale: springConfigs.bouncy,
+                y: {
+                  duration: 4,
+                  repeat: Number.POSITIVE_INFINITY,
+                  ease: "easeInOut",
+                  delay: 0.5,
+                },
               }}
             >
               CS and math student at{" "}
-              <span className="text-[#8A1538] font-bold">MIT</span>
+              <span
+                style={{ color: "var(--text-accent)" }}
+                className="font-bold"
+              >
+                MIT
+              </span>
             </motion.h2>
 
             <motion.nav
-              className="flex flex-wrap gap-4 lg:gap-6 text-base mb-6"
+              className="flex flex-wrap items-center gap-4 lg:gap-6 text-base mb-6"
               animate={{
                 justifyContent:
                   titlePosition === "top" ? "center" : "flex-start",
               }}
-              transition={{
-                type: "spring",
-                stiffness: 400,
-                damping: 40,
-              }}
+              transition={springConfigs.wobbly}
             >
-              <a
+              <motion.a
                 href="mailto:skula@mit.edu"
-                className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
+                className="relative transition-colors duration-300"
+                style={{ color: "var(--text-secondary)" }}
+                whileHover={{ scale: 1.05, color: "var(--text-primary)" }}
+                transition={springConfigs.bouncy}
               >
                 Email
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href="https://github.com/0xCUB3"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
+                className="relative transition-colors duration-300"
+                style={{ color: "var(--text-secondary)" }}
+                whileHover={{ scale: 1.05, color: "var(--text-primary)" }}
+                transition={springConfigs.bouncy}
               >
                 GitHub
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href="https://linkedin.com/in/skula"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
+                className="relative transition-colors duration-300"
+                style={{ color: "var(--text-secondary)" }}
+                whileHover={{ scale: 1.05, color: "var(--text-primary)" }}
+                transition={springConfigs.bouncy}
               >
                 LinkedIn
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href="/resume"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#979797] hover:text-[#272727] transition-colors duration-300"
+                className="relative transition-colors duration-300"
+                style={{ color: "var(--text-secondary)" }}
+                whileHover={{ scale: 1.05, color: "var(--text-primary)" }}
+                transition={springConfigs.bouncy}
               >
                 Resume
-              </a>
+              </motion.a>
+              <ThemeToggle />
             </motion.nav>
           </motion.div>
         </motion.div>
@@ -561,29 +604,37 @@ export default function Home() {
       {hoveredProject !== null && (
         <motion.div
           className="fixed z-50 pointer-events-none left-1/2 top-1/2"
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
+          initial={{ scale: 0.6, opacity: 0, rotate: -2 }}
+          animate={{ scale: 1, opacity: 1, rotate: 0 }}
           exit={{ scale: 0.9, opacity: 0 }}
           style={{
             x: popupX,
             y: popupY,
           }}
-          transition={{
-            type: "tween",
-            duration: 0.12,
-            ease: [0.25, 0.46, 0.45, 0.94],
-          }}
+          transition={springConfigs.bouncy}
         >
-          <div
+          <motion.div
             className={`bubble-content rounded-3xl p-10 min-w-[380px] relative z-10 ${
               projects[hoveredProject].content.table ? "max-w-3xl" : "max-w-md"
             }`}
+            initial={{ y: 10 }}
+            animate={{ y: 0 }}
+            transition={{
+              ...springConfigs.wobbly,
+              delay: 0.05,
+            }}
           >
-            <h3 className="font-semibold text-[#1a1a1a] text-2xl mb-4 relative z-10">
+            <h3
+              className="font-semibold text-2xl mb-4 relative z-10"
+              style={{ color: "var(--bubble-text)" }}
+            >
               {projects[hoveredProject].name}
             </h3>
 
-            <p className="text-[#666666] text-base mb-6 leading-relaxed relative z-10">
+            <p
+              className="text-base mb-6 leading-relaxed relative z-10"
+              style={{ color: "var(--bubble-text-secondary)" }}
+            >
               {projects[hoveredProject].content.description}
             </p>
 
@@ -613,19 +664,22 @@ export default function Home() {
             {projects[hoveredProject].content.table && (
               <div className="mb-6">
                 {projects[hoveredProject].content.table.title && (
-                  <h4 className="text-sm font-semibold text-[#1a1a1a] mb-3">
+                  <h4
+                    className="text-sm font-semibold mb-3"
+                    style={{ color: "var(--bubble-text)" }}
+                  >
                     {projects[hoveredProject].content.table.title}
                   </h4>
                 )}
-                <div className="overflow-x-auto rounded-lg border border-gray-100">
+                <div className="overflow-x-auto rounded-lg border border-gray-100 dark:border-gray-700">
                   <table className="w-full text-xs">
-                    <thead className="bg-gray-50/50">
+                    <thead className="bg-gray-50/50 dark:bg-gray-800/50">
                       <tr>
                         {projects[hoveredProject].content.table.headers.map(
                           (header, idx) => (
                             <th
                               key={header}
-                              className={`px-3 py-2 text-left font-medium text-[#666666] border-b border-gray-100 ${
+                              className={`px-3 py-2 text-left font-medium border-b border-gray-100 dark:border-gray-700 ${
                                 idx ===
                                 (projects[hoveredProject].content.table?.headers
                                   .length || 0) -
@@ -633,6 +687,7 @@ export default function Home() {
                                   ? "min-w-[200px]"
                                   : ""
                               }`}
+                              style={{ color: "var(--bubble-text-secondary)" }}
                             >
                               {header}
                             </th>
@@ -640,21 +695,24 @@ export default function Home() {
                         )}
                       </tr>
                     </thead>
-                    <tbody className="bg-white/50 divide-y divide-gray-100">
+                    <tbody className="bg-white/50 dark:bg-gray-900/50 divide-y divide-gray-100 dark:divide-gray-700">
                       {projects[hoveredProject].content.table.rows.map(
                         (row, rowIdx) => (
                           <tr
                             key={`row-${row[0]}-${rowIdx}`}
-                            className="hover:bg-gray-50/50 transition-colors"
+                            className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors"
                           >
                             {row.map((cell, cellIdx) => (
                               <td
                                 key={`cell-${String(cell)}-${cellIdx}`}
-                                className={`px-3 py-2 text-[#666666] ${
+                                className={`px-3 py-2 ${
                                   cellIdx === row.length - 1
                                     ? ""
                                     : "whitespace-nowrap"
                                 }`}
+                                style={{
+                                  color: "var(--bubble-text-secondary)",
+                                }}
                               >
                                 {typeof cell === "number"
                                   ? cell.toLocaleString()
@@ -676,16 +734,22 @@ export default function Home() {
                   (detail, idx) => (
                     <li
                       key={`detail-${idx}-${detail.slice(0, 20)}`}
-                      className="text-sm text-[#979797] flex items-start"
+                      className="text-sm flex items-start"
+                      style={{ color: "var(--text-secondary)" }}
                     >
-                      <span className="text-[#6b7280] mr-2 mt-0.5">•</span>
+                      <span
+                        className="mr-2 mt-0.5"
+                        style={{ color: "var(--text-hover)" }}
+                      >
+                        •
+                      </span>
                       <span>{detail}</span>
                     </li>
                   ),
                 )}
               </ul>
             )}
-          </div>
+          </motion.div>
         </motion.div>
       )}
     </div>

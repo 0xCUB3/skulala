@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "next-themes";
 import { useEffect, useRef } from "react";
 import { createNoise2D } from "simplex-noise";
 
@@ -7,6 +8,7 @@ const NoiseBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
   const startTimeRef = useRef<number>(0);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -16,6 +18,7 @@ const NoiseBackground = () => {
     if (!ctx) return;
 
     const noise2D = createNoise2D();
+    const isDark = resolvedTheme === "dark";
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -52,13 +55,25 @@ const NoiseBackground = () => {
         const noiseValue = noise2D(x, y + timeScale);
         const noiseValue2 = noise2D(x + 100, y + timeScale + 50);
 
-        // Map noise to subtle gray variations
-        const baseGray = 248 + noiseValue * 8; // Range: 240-256
-        const baseGray2 = 249 + noiseValue2 * 6; // Range: 243-255
+        let r: number, g: number, b: number;
 
-        const r = Math.floor(Math.max(240, Math.min(255, baseGray)));
-        const g = Math.floor(Math.max(240, Math.min(255, baseGray2)));
-        const b = Math.floor(Math.max(245, Math.min(255, baseGray + 2)));
+        if (isDark) {
+          // Dark mode: deep purples/blues with subtle variation
+          const baseValue = 18 + noiseValue * 6; // Range: 12-24
+          const baseValue2 = 18 + noiseValue2 * 4; // Range: 14-22
+          r = Math.floor(Math.max(12, Math.min(28, baseValue)));
+          g = Math.floor(Math.max(12, Math.min(28, baseValue2)));
+          b = Math.floor(
+            Math.max(18, Math.min(38, baseValue + 8 + noiseValue2 * 4)),
+          ); // Slight blue/purple tint
+        } else {
+          // Light mode: subtle gray variations (original)
+          const baseGray = 248 + noiseValue * 8; // Range: 240-256
+          const baseGray2 = 249 + noiseValue2 * 6; // Range: 243-255
+          r = Math.floor(Math.max(240, Math.min(255, baseGray)));
+          g = Math.floor(Math.max(240, Math.min(255, baseGray2)));
+          b = Math.floor(Math.max(245, Math.min(255, baseGray + 2)));
+        }
 
         gradient.addColorStop(position, `rgb(${r}, ${g}, ${b})`);
       }
@@ -79,12 +94,30 @@ const NoiseBackground = () => {
 
       const overlayOpacity =
         0.03 + (noise2D(timeScale * 0.3, timeScale * 0.4) + 1) * 0.02;
-      overlayGradient.addColorStop(0, `rgba(250, 251, 252, ${overlayOpacity})`);
-      overlayGradient.addColorStop(
-        0.5,
-        `rgba(248, 249, 250, ${overlayOpacity * 0.7})`,
-      );
-      overlayGradient.addColorStop(1, "rgba(246, 247, 248, 0)");
+
+      if (isDark) {
+        // Dark mode overlay: subtle purple glow
+        overlayGradient.addColorStop(
+          0,
+          `rgba(60, 50, 80, ${overlayOpacity * 1.5})`,
+        );
+        overlayGradient.addColorStop(
+          0.5,
+          `rgba(40, 35, 60, ${overlayOpacity})`,
+        );
+        overlayGradient.addColorStop(1, "rgba(20, 20, 30, 0)");
+      } else {
+        // Light mode overlay (original)
+        overlayGradient.addColorStop(
+          0,
+          `rgba(250, 251, 252, ${overlayOpacity})`,
+        );
+        overlayGradient.addColorStop(
+          0.5,
+          `rgba(248, 249, 250, ${overlayOpacity * 0.7})`,
+        );
+        overlayGradient.addColorStop(1, "rgba(246, 247, 248, 0)");
+      }
 
       ctx.fillStyle = overlayGradient;
       ctx.fillRect(0, 0, width, height);
@@ -100,13 +133,16 @@ const NoiseBackground = () => {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, [resolvedTheme]);
+
+  const bgColor =
+    resolvedTheme === "dark" ? "rgb(18, 18, 22)" : "rgb(248, 249, 250)";
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 -z-10 w-full h-full"
-      style={{ background: "rgb(248, 249, 250)" }}
+      className="fixed inset-0 -z-10 w-full h-full transition-colors duration-300"
+      style={{ background: bgColor }}
     />
   );
 };

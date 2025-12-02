@@ -220,6 +220,16 @@ export default function Home() {
       },
     },
     {
+      name: "About This Hack",
+      year: "2024",
+      githubUrl: "https://github.com/2009-Nissan-Cube/About-This-Hack",
+      content: {
+        description:
+          "A sleek macOS hardware info app that brings back the beloved classic 'About This Mac' interface from pre-Ventura while offering additional features for both Hackintosh and real Mac users.",
+        images: ["/projects/about-this-hack/homepage.png"],
+      },
+    },
+    {
       name: "Sir Tim the Timely",
       year: "2025",
       githubUrl: "https://github.com/0xCUB3/sir-tim-the-timely",

@@ -221,7 +221,7 @@ export default function Home() {
     },
     {
       name: "About This Hack",
-      year: "2024",
+      year: "2025",
       githubUrl: "https://github.com/2009-Nissan-Cube/About-This-Hack",
       content: {
         description:

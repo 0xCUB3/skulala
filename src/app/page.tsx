@@ -671,9 +671,9 @@ export default function Home() {
                     {projects[hoveredProject].content.table.title}
                   </h4>
                 )}
-                <div className="overflow-x-auto rounded-lg border border-gray-100 dark:border-gray-700">
+                <div className="overflow-x-auto rounded-lg border border-gray-200/50 dark:border-gray-600/50">
                   <table className="w-full text-xs">
-                    <thead className="bg-gray-50/50 dark:bg-gray-800/50">
+                    <thead className="bg-black/[0.03] dark:bg-white/[0.05]">
                       <tr>
                         {projects[hoveredProject].content.table.headers.map(
                           (header, idx) => (
@@ -695,12 +695,12 @@ export default function Home() {
                         )}
                       </tr>
                     </thead>
-                    <tbody className="bg-white/50 dark:bg-gray-900/50 divide-y divide-gray-100 dark:divide-gray-700">
+                    <tbody className="divide-y divide-gray-200/30 dark:divide-gray-600/30">
                       {projects[hoveredProject].content.table.rows.map(
                         (row, rowIdx) => (
                           <tr
                             key={`row-${row[0]}-${rowIdx}`}
-                            className="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors"
+                            className="hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors"
                           >
                             {row.map((cell, cellIdx) => (
                               <td

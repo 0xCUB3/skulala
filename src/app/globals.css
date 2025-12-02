@@ -231,9 +231,9 @@
         backdrop-filter: blur(var(--frost-blur)) saturate(180%);
         background: linear-gradient(
             135deg,
-            rgba(var(--tint-color), 0.35) 0%,
-            rgba(var(--tint-color), 0.28) 50%,
-            rgba(var(--subtle-accent), 0.42) 100%
+            rgba(var(--tint-color), 0.92) 0%,
+            rgba(var(--tint-color), 0.88) 50%,
+            rgba(var(--subtle-accent), 0.94) 100%
         );
         border: 1px solid var(--bubble-border);
         box-shadow:
